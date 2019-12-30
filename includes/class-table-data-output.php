@@ -134,6 +134,7 @@ class BuddyFormsFrontendTableDataOutput {
 			$fields_keys = array_keys( $fields );
 
 			$order_target_column = isset( $_POST['order'] ) && is_array( $_POST['order'] ) ? $_POST['order'] : false;
+			$target_column       = isset( $_POST['columns'] ) && is_array( $_POST['columns'] ) ? $_POST['columns'] : false;
 
 			$apply_order = isset( $order_target_column ) && isset( $order_target_column[0]['column'] );
 
@@ -147,20 +148,35 @@ class BuddyFormsFrontendTableDataOutput {
 
 			$extra_ordering = array();
 			if ( $apply_order ) {
-				foreach ( $order_target_column as $item ) {
-					if ( isset( $item['column'] ) ) {
-						$target_field_id = ! empty( $fields_keys[ $item['column'] ] ) ? $fields_keys[ $item['column'] ] : false;
+				foreach ( $order_target_column as $item_order ) {
+					if ( isset( $item_order['column'] ) ) {
+						$target_field_id = ! empty( $fields_keys[ $item_order['column'] ] ) ? $fields_keys[ $item_order['column'] ] : false;
 						if ( ! empty( $target_field_id ) ) {
-							$target_field                      = $fields[ $target_field_id ];
-							$order_key                         = $target_field['slug'] . '_clause';
-							$extra_ordering[ $item['column'] ] = $order_key;
-							$meta_query[ $order_key ]          = array(
+							$target_field                            = $fields[ $target_field_id ];
+							$meta_key                                = $target_field['slug'] . '_clause';
+							$extra_ordering[ $item_order['column'] ] = $meta_key;
+							$meta_query[ $meta_key ]                 = array(
 								'key'     => $target_field['slug'],
-								'compare' => 'EXISTS',
+								'compare' => 'EXIST',
 							);
 						}
 					}
 
+				}
+			}
+
+			foreach ( $target_column as $item_column ) {
+				if ( isset( $item_column['data'] ) && isset( $item_column['search'] ) && isset( $item_column['search']['value'] ) &&  strlen($item_column['search']['value']) > 0 ) {
+					$target_field_id = ! empty( $fields_keys[ $item_column['data'] ] ) ? $fields_keys[ $item_column['data'] ] : false;
+					if ( ! empty( $target_field_id ) ) {
+						$target_field            = $fields[ $target_field_id ];
+						$meta_key                = $target_field['slug'] . '_clause';
+						$meta_query[ $meta_key ] = array(
+							'key'     => $target_field['slug'],
+							'value'   => apply_filters( 'buddyforms_datatable_meta_value', $item_column['search']['value'], $item_column, $meta_key, $target_field, $form_slug ),
+							'compare' => apply_filters( 'buddyforms_datatable_meta_compare', '=', $item_column, $meta_key, $target_field, $form_slug ),
+						);
+					}
 				}
 			}
 
@@ -176,12 +192,12 @@ class BuddyFormsFrontendTableDataOutput {
 
 			if ( $apply_order && ! empty( $extra_ordering ) ) {
 				$ordering = array();
-				foreach ( $order_target_column as $item ) {
-					if ( isset( $item['column'] ) ) {
-						$order     = ! empty( $item['dir'] ) ? $item['dir'] : 'ASC';
-						$order_key = isset( $extra_ordering[ $item['column'] ] ) ? $extra_ordering[ $item['column'] ] : false;
-						if ( ! empty( $order_key ) ) {
-							$ordering[ $order_key ] = $order;
+				foreach ( $order_target_column as $item_order ) {
+					if ( isset( $item_order['column'] ) ) {
+						$order    = ! empty( $item_order['dir'] ) ? $item_order['dir'] : 'ASC';
+						$meta_key = isset( $extra_ordering[ $item_order['column'] ] ) ? $extra_ordering[ $item_order['column'] ] : false;
+						if ( ! empty( $meta_key ) ) {
+							$ordering[ $meta_key ] = $order;
 						}
 					}
 				}

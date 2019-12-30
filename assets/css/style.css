@@ -17,3 +17,7 @@
 .buddyforms-data-table-filter-child.example {
 	display: none;
 }
+
+.fg-toolbar.ui-toolbar.ui-widget-header{
+	padding: 10px;
+}

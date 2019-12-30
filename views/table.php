@@ -39,18 +39,6 @@ $thead .= '</tr>';
 	<?php if ( ! empty( $columns ) ) : ?>
 		<?php if ( ! empty( $need_filter_container ) ) : ?>
 			<div class="buddyforms-data-table-filter-container" id="buddyforms-data-table-filter-container-<?php echo $form_slug ?>">
-				<div id="example" class="buddyforms-data-table-filter-child example">
-					<p><label for="example1"><strong>Example 1</strong></label></p><input type="text" name="example1" id="example1">
-				</div>
-				<div class="buddyforms-data-table-filter-child">
-					<p><label for="example1"><strong>Example 1</strong></label></p><input type="text" name="example1" id="example1">
-				</div>
-				<div class="buddyforms-data-table-filter-child">
-					<p><label for="example1"><strong>Example 1</strong></label></p><input type="text" name="example1" id="example1">
-				</div>
-				<div class="buddyforms-data-table-filter-child">
-					<p><label for="example1"><strong>Example 1</strong></label></p><input type="text" name="example1" id="example1">
-				</div>
 			</div>
 		<?php endif; ?>
 		<table id="buddyforms-data-table-<?php echo $form_slug ?>" class="display" style="width:100%" data-form-slug="<?php echo $form_slug ?>" <?php echo $initial_order ?>>

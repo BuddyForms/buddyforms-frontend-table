@@ -4,13 +4,27 @@ var buddyformsDatatableInstance = {
 			return false;
 		}
 
+		var haveFilters = false;
 		var headRows = jQuery(currentTable).find('thead th');
-		var filterExample = filterContainer.find('#example');
+		var filterExample = '<div id="SLUG" class="buddyforms-data-table-filter-child"><p><label for="SLUG"><strong>NAME</strong></label></p><input data-target-column="COLUMN" class="buddyforms-datatable-filter-input" type="search" name="SLUG" id="SLUG"></div>';
+		var targetColumn = 0;
 		jQuery.each(headRows, function () {
 			var currentRow = jQuery(this);
 			var isSearchable = currentRow.attr('data-searchable');
-
+			if (isSearchable && isSearchable.toLowerCase() === "true") {
+				var filterString = filterExample;
+				var targetName = currentRow.text();
+				var targetSlug = currentRow.attr('data-field-slug');
+				filterString = filterString.replace(/SLUG/g, targetSlug);
+				filterString = filterString.replace(/NAME/g, targetName);
+				filterString = filterString.replace(/COLUMN/g, targetColumn);
+				filterContainer.append(filterString);
+				haveFilters = true;
+			}
+			targetColumn++;
 		});
+
+		return haveFilters;
 	},
 	init: function () {
 		var tableContainer = jQuery('.buddyforms_data_table');
@@ -64,7 +78,19 @@ var buddyformsDatatableInstance = {
 					};
 				}
 
-				jQuery(currentTable).DataTable(tableOptions);
+				var dataTable = jQuery(currentTable).DataTable(tableOptions);
+
+				if (dataTable) {
+					// Apply the search by columns
+					dataTable.columns().every(function () {
+						var that = this;
+						jQuery('input[data-target-column="' + that[0] + '"]', tableContainer).on('keyup change clear', function () {
+							if (that.search() !== this.value) {
+								that.search(this.value).draw();
+							}
+						});
+					});
+				}
 			}
 		}
 	}
