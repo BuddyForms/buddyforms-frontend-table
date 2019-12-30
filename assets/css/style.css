@@ -1,0 +1,19 @@
+.buddyforms-data-table-filter-container{
+	margin-bottom: 10px;
+	display: flex;
+	width: 100%;
+	flex-direction: row;
+	flex-flow: row wrap;
+}
+
+.buddyforms-data-table-filter-child{
+	margin-left: 5px;
+}
+
+.buddyforms-data-table-filter-container p{
+	margin-bottom: 10px;
+}
+
+.buddyforms-data-table-filter-child.example {
+	display: none;
+}
