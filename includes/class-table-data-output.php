@@ -21,6 +21,16 @@ class BuddyFormsFrontendTableDataOutput {
 		add_action( 'wp_ajax_nopriv_buddyforms_data_table', array( $this, 'ajax_get_buddyforms_data_table' ) );
 		add_action( 'wp_ajax_buddyforms_data_table_autocomplete', array( $this, 'ajax_get_buddyforms_data_table_autocomplete' ) );
 		add_action( 'wp_ajax_nopriv_buddyforms_data_table_autocomplete', array( $this, 'ajax_get_buddyforms_data_table_autocomplete' ) );
+//		add_filter( 'buddyforms_datatable_action_html', array( $this, 'buddyforms_datatable_action_column' ), 10, 5 );
+		add_action('buddyforms_the_loop_after_actions', function(){
+			echo "<h3>UUUU</h3>";
+		});
+	}
+
+	public function buddyforms_datatable_action_column( $action_html, $post_id, $form_slug, $fields, $entry_metas ) {
+
+
+		return "<h3>UUUU</h3>";
 	}
 
 	public function include_assets() {
@@ -43,7 +53,7 @@ class BuddyFormsFrontendTableDataOutput {
 				//https://datatables.net/reference/option/processing
 				'processing'  => apply_filters( 'buddyforms_datatable_processing', true ),
 				//https://datatables.net/reference/option/searching
-				'searching'   => apply_filters( 'buddyforms_datatable_searching', false ),
+				'searching'   => apply_filters( 'buddyforms_datatable_searching', true ),
 				//https://datatables.net/reference/option/searchDelay
 				'searchDelay' => apply_filters( 'buddyforms_datatable_search_delay', 400 ),
 				//https://datatables.net/reference/option/language
@@ -93,9 +103,9 @@ class BuddyFormsFrontendTableDataOutput {
 
 			$form_slug     = buddyforms_sanitize_slug( $_POST['form_slug'] );
 			$query         = ! empty( $_POST['query'] ) ? sanitize_text_field( $_POST['query'] ) : false;
-			$target_column = isset( $_POST['target_column'] ) && ! empty( $_POST['target_column'][0] ) ? intval( $_POST['target_column'][0] ) : false;
+			$target_column = isset( $_POST['target_column'] ) && isset( $_POST['target_column'][0] ) ? intval( $_POST['target_column'][0] ) : false;
 
-			if ( empty( $query ) || empty( $target_column ) || empty( $form_slug ) ) {
+			if ( empty( $query ) || $target_column === false || empty( $form_slug ) ) {
 				die();
 			}
 
@@ -190,6 +200,19 @@ class BuddyFormsFrontendTableDataOutput {
 		die();
 	}
 
+	public function buddyforms_cast_field_type( $field_type ) {
+		switch ( $field_type ) {
+			case 'time':
+			case 'date':
+				$cast = 'DATETIME';
+				break;
+			default:
+				$cast = 'CHAR';
+		}
+
+		return $cast;
+	}
+
 	public function ajax_get_buddyforms_data_table() {
 		try {
 			if ( ! ( is_array( $_POST ) && defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
@@ -213,6 +236,7 @@ class BuddyFormsFrontendTableDataOutput {
 			// if multi site is enabled switch to the form blog id
 			buddyforms_switch_to_form_blog( $form_slug );
 
+			$has_action   = isset( $_POST['has_action'] ) ? boolval( $_POST['has_action'] ) : false;
 			$draw         = isset( $_POST['draw'] ) ? intval( $_POST['draw'] ) : 1;
 			$start        = isset( $_POST['start'] ) ? intval( $_POST['start'] ) : 0;
 			$length       = isset( $_POST['length'] ) ? intval( $_POST['length'] ) : apply_filters( 'buddyforms_user_posts_query_args_posts_per_page', 10 );
@@ -265,18 +289,39 @@ class BuddyFormsFrontendTableDataOutput {
 			if ( $apply_order ) {
 				foreach ( $order_target_column as $item_order ) {
 					if ( isset( $item_order['column'] ) ) {
-						$target_field_id = ! empty( $fields_keys[ $item_order['column'] ] ) ? $fields_keys[ $item_order['column'] ] : false;
+						$target_field_id = ! empty( $fields_keys[ intval( $item_order['column'] ) ] ) ? $fields_keys[ intval( $item_order['column'] ) ] : false;
 						if ( ! empty( $target_field_id ) ) {
-							$target_field                            = $fields[ $target_field_id ];
-							$meta_key                                = $target_field['slug'] . '_clause';
-							$extra_ordering[ $item_order['column'] ] = $meta_key;
-							$meta_query[ $meta_key ]                 = array(
+							$target_field                                      = $fields[ $target_field_id ];
+							$meta_key                                          = $target_field['slug'] . '_clause';
+							$extra_ordering[ intval( $item_order['column'] ) ] = $meta_key;
+							$meta_query[ $meta_key ]                           = array(
 								'key'     => $target_field['slug'],
 								'compare' => 'EXIST',
+								'type'    => $this->buddyforms_cast_field_type( $target_field['type'] )
 							);
 						}
 					}
 
+				}
+			}
+
+			$exist_title   = buddyforms_exist_field_type_in_form( $form_slug, 'buddyforms_form_title' );
+			$exist_content = buddyforms_exist_field_type_in_form( $form_slug, 'buddyforms_form_content' );
+
+			if ( ! empty( $search_value ) ) {
+				if ( $exist_title || $exist_content ) {
+					$query_args['s'] = $search_value;
+				} else {
+					$search_query = array( 'relation' => 'OR', );
+					foreach ( $fields as $field ) {
+						$meta_key                  = $field['slug'] . '_clause';
+						$search_query[ $meta_key ] = array(
+							'key'     => $field['slug'],
+							'value'   => apply_filters( 'buddyforms_datatable_search_value', $search_value, $field, $meta_key, $form_slug ),
+							'compare' => apply_filters( 'buddyforms_datatable_search_compare', 'LIKE', $field, $meta_key, $form_slug ),
+						);
+					}
+					$meta_query[] = $search_query;
 				}
 			}
 
@@ -319,10 +364,6 @@ class BuddyFormsFrontendTableDataOutput {
 				$query_args['orderby'] = $ordering;
 			}
 
-			if ( ! empty( $search_value ) ) {
-				$query_args['s'] = $search_value;
-			}
-
 			if ( ! current_user_can( 'buddyforms_' . $form_slug . '_all' ) ) {
 				$query_args['author'] = $the_author_id;
 			}
@@ -344,6 +385,20 @@ class BuddyFormsFrontendTableDataOutput {
 						$final_result = array();
 						foreach ( $entry_metas as $entry_meta ) {
 							$final_result[] = isset( $entry_meta['value'] ) ? $entry_meta['value'] : '';
+						}
+						if ( $has_action ) {
+							ob_start();
+							echo '<div class="action"><div class="meta">';
+//							global $post;
+//							$post = get_post( $post_id, OBJECT );
+//							setup_postdata( $post );
+//							buddyforms_post_entry_actions( $form_slug );
+							do_action( 'buddyforms_the_loop_after_actions', $post_id, $form_slug );
+							echo '</div></div>';
+							$action_html = ob_get_clean();
+//							wp_reset_postdata();
+							$action_html    = apply_filters( 'buddyforms_datatable_action_html', $action_html, $post_id, $form_slug, $fields, $entry_metas );
+							$final_result[] = $action_html;
 						}
 						$result['data'][] = $final_result;
 					}

@@ -39,6 +39,15 @@ var buddyformsDatatableInstance = {
 					return;
 				}
 
+				var headerRows = currentTable.find('thead>tr>th');
+				var hasHeaderRows = (headerRows && headerRows.length > 0);
+
+				if (!hasHeaderRows) {
+					return;
+				}
+
+				var hasActionColumn = currentTable.find('thead>tr>th[data-field-slug="actions"]').length > 0;
+
 				var filterContainer = tableContainer.find('.buddyforms-data-table-filter-container');
 				var needFilters = (filterContainer && filterContainer.length > 0);
 
@@ -57,6 +66,7 @@ var buddyformsDatatableInstance = {
 							d.action = 'buddyforms_data_table';
 							d.nonce = buddyformsDatatable.nonce;
 							d.form_slug = targetForm;
+							d.has_action = hasActionColumn;
 						}
 					}
 				};

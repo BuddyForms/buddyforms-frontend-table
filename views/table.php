@@ -2,8 +2,9 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-$columns        = BuddyFormsFrontendTableDataOutput::get_table_columns( $form_slug );
-$footer_enabled = true;
+$columns          = BuddyFormsFrontendTableDataOutput::get_table_columns( $form_slug );
+$columns['actions'] = array( 'frontend_table_sortable' => array( false ), 'frontend_table_filter' => array( false ), 'frontend_table' => array( 'enabled' ), 'name' => 'Neem contact op', 'type' => 'edit' );
+$footer_enabled   = true;
 
 $need_filter_container = false;
 $initial_order         = '';
