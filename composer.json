@@ -1,8 +1,8 @@
 {
   "name": "themekraft/buddyforms-frontend-table",
-  "description": "",
+  "description": "Use BuddyForms with a nice Frontend Table",
   "type": "wordpress-plugin",
-  "keywords": ["frontend table", "buddyforms"],
+  "keywords": ["frontend table", "buddyforms", "datatable"],
   "homepage": "https://github.com/BuddyForms/buddyforms-frontend-table/",
   "license": "GPL-2.0+",
   "authors": [
@@ -25,7 +25,7 @@
   "scripts": {
     "package": "sh .tk/package.sh loader",
     "wp-release": "sh .tk/wp_release.sh",
-    "beta-release": "sh .tk/full-deploy.sh buddyforms-frontend-table 407 false beta",
-    "full-release": "sh .tk/full-deploy.sh buddyforms-frontend-table 407 false released"
+    "beta-release": "sh .tk/full-deploy.sh buddyforms-frontend-table 5264 false beta",
+    "full-release": "sh .tk/full-deploy.sh buddyforms-frontend-table 5264 false released"
   }
 }

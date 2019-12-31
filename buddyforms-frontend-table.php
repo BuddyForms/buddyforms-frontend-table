@@ -3,7 +3,7 @@
 /**
  * Plugin Name: BuddyForms Frontend Table
  * Plugin URI: https://themekraft.com/
- * Description:
+ * Description: Use BuddyForms with a nice Frontend Table
  * Version: 1.0.0
  * Author: ThemeKraft Team
  * Author URI: https://themekraft.com/
@@ -85,8 +85,8 @@ class BuddyFormsFrontendTable {
 	}
 
 	public static function error_log( $message ) {
-		if(!empty($message)){
-			error_log(self::getSlug(). ' -- '. $message);
+		if ( ! empty( $message ) ) {
+			error_log( self::getSlug() . ' -- ' . $message );
 		}
 	}
 
@@ -162,94 +162,97 @@ class BuddyFormsFrontendTable {
 }
 
 
-//if ( ! function_exists( 'buddyforms_frontend_table_fs' ) ) {
-//	// Create a helper function for easy SDK access.
-//	function buddyforms_frontend_table_fs() {
-//		global $buddyforms_frontend_table_fs;
-//
-//		if ( ! isset( $buddyforms_frontend_table_fs ) ) {
-//			// Include Freemius SDK.
-//			if ( file_exists( dirname( dirname( __FILE__ ) ) . '/buddyforms/includes/resources/freemius/start.php' ) ) {
-//				// Try to load SDK from parent plugin folder.
-//				require_once dirname( dirname( __FILE__ ) ) . '/buddyforms/includes/resources/freemius/start.php';
-//			} else if ( file_exists( dirname( dirname( __FILE__ ) ) . '/buddyforms-premium/includes/resources/freemius/start.php' ) ) {
-//				// Try to load SDK from premium parent plugin folder.
-//				require_once dirname( dirname( __FILE__ ) ) . '/buddyforms-premium/includes/resources/freemius/start.php';
-//			}
-//
-//			try {
-//				$buddyforms_frontend_table_fs = fs_dynamic_init( array(
-//					'id'               => '4706',
-//					'slug'             => 'bf-pods',
-//					'type'             => 'plugin',
-//					'public_key'       => 'pk_5ffd22ecf0de8130b49fc380bf260',
-//					'is_premium'       => true,
-//					'is_premium_only'  => true,
-//					'has_paid_plans'   => true,
-//					'is_org_compliant' => false,
-//					'parent'           => array(
-//						'id'         => '391',
-//						'slug'       => 'buddyforms',
-//						'public_key' => 'pk_dea3d8c1c831caf06cfea10c7114c',
-//						'name'       => 'BuddyForms',
-//					),
-//					'menu'             => array(
-//						'first-path' => 'plugins.php',
-//						'support'    => false,
-//					)
-//				) );
-//			} catch ( Freemius_Exception $e ) {
-//				return false;
-//			}
-//		}
-//
-//		return $buddyforms_frontend_table_fs;
-//	}
-//}
-//
-//function buddyforms_frontend_table_fs_is_parent_active_and_loaded() {
-//	// Check if the parent's init SDK method exists.
-//	return function_exists( 'buddyforms_core_fs' );
-//}
-//
-//function buddyforms_frontend_table_fs_is_parent_active() {
-//	$active_plugins = get_option( 'active_plugins', array() );
-//
-//	if ( is_multisite() ) {
-//		$network_active_plugins = get_site_option( 'active_sitewide_plugins', array() );
-//		$active_plugins         = array_merge( $active_plugins, array_keys( $network_active_plugins ) );
-//	}
-//
-//	foreach ( $active_plugins as $basename ) {
-//		if ( 0 === strpos( $basename, 'buddyforms/' ) ||
-//		     0 === strpos( $basename, 'buddyforms-premium/' )
-//		) {
-//			return true;
-//		}
-//	}
-//
-//	return false;
-//}
-//
-//function buddyforms_frontend_table_fs_init() {
-//	if ( buddyforms_frontend_table_fs_is_parent_active_and_loaded() ) {
-//		// Init Freemius.
-//		buddyforms_frontend_table_fs();
-//		// Signal that the add-on's SDK was initiated.
-//		do_action( 'buddyforms_frontend_table_fs_loaded' );
-//		$GLOBALS['BuddyFormsFrontendTable'] = BuddyFormsFrontendTable::get_instance();
-//	}
-//}
-//
-//if ( buddyforms_frontend_table_fs_is_parent_active_and_loaded() ) {
-//	// If parent already included, init add-on.
-//	buddyforms_frontend_table_fs_init();
-//} else if ( buddyforms_frontend_table_fs_is_parent_active() ) {
-//	// Init add-on only after the parent is loaded.
-//	add_action( 'buddyforms_core_fs_loaded', 'buddyforms_frontend_table_fs_init' );
-//} else {
-//	// Even though the parent is not activated, execute add-on for activation / uninstall hooks.
-//	buddyforms_frontend_table_fs_init();
-//}
+if ( ! function_exists( 'buddyforms_frontend_table_fs' ) ) {
+	// Create a helper function for easy SDK access.
+	function buddyforms_frontend_table_fs() {
+		global $buddyforms_frontend_table_fs;
 
-$GLOBALS['BuddyFormsFrontendTable'] = BuddyFormsFrontendTable::get_instance();
+		if ( ! isset( $buddyforms_frontend_table_fs ) ) {
+			// Include Freemius SDK.
+			if ( file_exists( dirname( dirname( __FILE__ ) ) . '/buddyforms/includes/resources/freemius/start.php' ) ) {
+				// Try to load SDK from parent plugin folder.
+				require_once dirname( dirname( __FILE__ ) ) . '/buddyforms/includes/resources/freemius/start.php';
+			} else if ( file_exists( dirname( dirname( __FILE__ ) ) . '/buddyforms-premium/includes/resources/freemius/start.php' ) ) {
+				// Try to load SDK from premium parent plugin folder.
+				require_once dirname( dirname( __FILE__ ) ) . '/buddyforms-premium/includes/resources/freemius/start.php';
+			}
+
+			try {
+				$buddyforms_frontend_table_fs = fs_dynamic_init( array(
+					'id'               => '5264',
+					'slug'             => 'buddyforms-frontend-table',
+					'type'             => 'plugin',
+					'public_key'       => 'pk_6cc61f1941b27894cca49b6a1d996',
+					'is_premium'       => true,
+					'is_premium_only'  => true,
+					'has_paid_plans'   => true,
+					'is_org_compliant' => false,
+					'trial'            => array(
+						'days'               => 14,
+						'is_require_payment' => true,
+					),
+					'parent'           => array(
+						'id'         => '391',
+						'slug'       => 'buddyforms',
+						'public_key' => 'pk_dea3d8c1c831caf06cfea10c7114c',
+						'name'       => 'BuddyForms',
+					),
+					'menu'             => array(
+						'first-path' => 'plugins.php',
+						'support'    => false,
+					),
+				) );
+			} catch ( Freemius_Exception $e ) {
+				return false;
+			}
+		}
+
+		return $buddyforms_frontend_table_fs;
+	}
+}
+
+function buddyforms_frontend_table_fs_is_parent_active_and_loaded() {
+	// Check if the parent's init SDK method exists.
+	return function_exists( 'buddyforms_core_fs' );
+}
+
+function buddyforms_frontend_table_fs_is_parent_active() {
+	$active_plugins = get_option( 'active_plugins', array() );
+
+	if ( is_multisite() ) {
+		$network_active_plugins = get_site_option( 'active_sitewide_plugins', array() );
+		$active_plugins         = array_merge( $active_plugins, array_keys( $network_active_plugins ) );
+	}
+
+	foreach ( $active_plugins as $basename ) {
+		if ( 0 === strpos( $basename, 'buddyforms/' ) ||
+		     0 === strpos( $basename, 'buddyforms-premium/' )
+		) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+function buddyforms_frontend_table_fs_init() {
+	if ( buddyforms_frontend_table_fs_is_parent_active_and_loaded() ) {
+		// Init Freemius.
+		buddyforms_frontend_table_fs();
+		// Signal that the add-on's SDK was initiated.
+		do_action( 'buddyforms_frontend_table_fs_loaded' );
+		$GLOBALS['BuddyFormsFrontendTable'] = BuddyFormsFrontendTable::get_instance();
+	}
+}
+
+if ( buddyforms_frontend_table_fs_is_parent_active_and_loaded() ) {
+	// If parent already included, init add-on.
+	buddyforms_frontend_table_fs_init();
+} else if ( buddyforms_frontend_table_fs_is_parent_active() ) {
+	// Init add-on only after the parent is loaded.
+	add_action( 'buddyforms_core_fs_loaded', 'buddyforms_frontend_table_fs_init' );
+} else {
+	// Even though the parent is not activated, execute add-on for activation / uninstall hooks.
+	buddyforms_frontend_table_fs_init();
+}
+
