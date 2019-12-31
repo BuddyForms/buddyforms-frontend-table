@@ -22,9 +22,6 @@ class BuddyFormsFrontendTableDataOutput {
 		add_action( 'wp_ajax_buddyforms_data_table_autocomplete', array( $this, 'ajax_get_buddyforms_data_table_autocomplete' ) );
 		add_action( 'wp_ajax_nopriv_buddyforms_data_table_autocomplete', array( $this, 'ajax_get_buddyforms_data_table_autocomplete' ) );
 //		add_filter( 'buddyforms_datatable_action_html', array( $this, 'buddyforms_datatable_action_column' ), 10, 5 );
-		add_action('buddyforms_the_loop_after_actions', function(){
-			echo "<h3>UUUU</h3>";
-		});
 	}
 
 	public function buddyforms_datatable_action_column( $action_html, $post_id, $form_slug, $fields, $entry_metas ) {
