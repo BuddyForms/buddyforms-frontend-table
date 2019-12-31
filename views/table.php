@@ -28,7 +28,7 @@ foreach ( $columns as $column_id => $columns_data ) {
 	}
 	if ( ! empty( $columns_data ) ) {
 		if ( ! empty( $columns_data['frontend_table'] ) && ! empty( $columns_data['frontend_table'][0] ) && $columns_data['frontend_table'][0] === 'enabled' ) {
-			$thead .= ' <th data-priority="' . $i . '" ' . $is_filterable_string . ' ' . $sortable_string . ' data-field-slug="' . $column_id . '">' . esc_html( $columns_data['name'] ) . '</th>';
+			$thead .= ' <th data-priority="' . $i . '" ' . $is_filterable_string . ' ' . $sortable_string . ' data-field-slug="' . $column_id . '" data-field-type="' . $columns_data['type'] . '">' . esc_html( $columns_data['name'] ) . '</th>';
 		}
 	}
 	$i ++;

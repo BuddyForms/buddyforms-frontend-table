@@ -1,4 +1,5 @@
 var buddyformsDatatableInstance = {
+	grantedAutocompleteFieldType: ['country', 'state'],
 	initFilterFor: function (targetForm, filterContainer, currentTable) {
 		if (!targetForm || !filterContainer || !currentTable) {
 			return false;
@@ -6,7 +7,7 @@ var buddyformsDatatableInstance = {
 
 		var haveFilters = false;
 		var headRows = jQuery(currentTable).find('thead th');
-		var filterExample = '<div id="SLUG" class="buddyforms-data-table-filter-child"><p><label for="SLUG"><strong>NAME</strong></label></p><input data-target-column="COLUMN" class="buddyforms-datatable-filter-input" type="search" name="SLUG" id="SLUG"></div>';
+		var filterExample = '<div id="SLUG" class="buddyforms-data-table-filter-child"><p><label for="SLUG"><strong>NAME</strong></label></p><input data-field-type="TYPE" data-form-slug="' + targetForm + '" data-target-column="COLUMN" class="buddyforms-datatable-filter-input" type="search" name="SLUG" id="SLUG"></div>';
 		var targetColumn = 0;
 		jQuery.each(headRows, function () {
 			var currentRow = jQuery(this);
@@ -15,8 +16,10 @@ var buddyformsDatatableInstance = {
 				var filterString = filterExample;
 				var targetName = currentRow.text();
 				var targetSlug = currentRow.attr('data-field-slug');
+				var targetType = currentRow.attr('data-field-type');
 				filterString = filterString.replace(/SLUG/g, targetSlug);
 				filterString = filterString.replace(/NAME/g, targetName);
+				filterString = filterString.replace(/TYPE/g, targetType);
 				filterString = filterString.replace(/COLUMN/g, targetColumn);
 				filterContainer.append(filterString);
 				haveFilters = true;
@@ -80,13 +83,40 @@ var buddyformsDatatableInstance = {
 
 				var dataTable = jQuery(currentTable).DataTable(tableOptions);
 
-				if (dataTable) {
+				if (dataTable && needFilters) {
 					// Apply the search by columns
 					dataTable.columns().every(function () {
 						var that = this;
-						jQuery('input[data-target-column="' + that[0] + '"]', tableContainer).on('keyup change clear', function () {
-							if (that.search() !== this.value) {
-								that.search(this.value).draw();
+						var config = {
+							serviceUrl: buddyformsDatatable.ajax,
+							autoSelectFirst: true,
+							showNoSuggestionNotice: true,
+							type: "POST",
+							params: {'action': 'buddyforms_data_table_autocomplete', 'nonce': buddyformsDatatable.nonce, 'form_slug': targetForm, 'target_column': that[0]},
+							onInvalidateSelection: function () {
+								that.search('').draw();
+							},
+							onSelect: function (suggestion) {
+								if (suggestion && suggestion.data && that.search() !== suggestion.data) {
+									that.search(suggestion.data).draw();
+								}
+							}
+						};
+						jQuery.each(jQuery('input[data-target-column="' + that[0] + '"]', tableContainer), function () {
+							var thisRow = jQuery(this);
+							var currentFieldType = thisRow.attr('data-field-type');
+							if (buddyformsDatatableInstance.grantedAutocompleteFieldType.indexOf(currentFieldType.toLowerCase()) > -1) {
+								thisRow.devbridgeAutocomplete(config);
+							} else {
+								thisRow.on('keyup change clear', function () {
+									if (this.value) {
+										if (that.search() !== this.value) {
+											that.search(this.value).draw();
+										}
+									} else {
+										that.search('').draw();
+									}
+								});
 							}
 						});
 					});

@@ -19,6 +19,8 @@ class BuddyFormsFrontendTableDataOutput {
 		add_action( 'wp_footer', array( $this, 'include_assets' ) );
 		add_action( 'wp_ajax_buddyforms_data_table', array( $this, 'ajax_get_buddyforms_data_table' ) );
 		add_action( 'wp_ajax_nopriv_buddyforms_data_table', array( $this, 'ajax_get_buddyforms_data_table' ) );
+		add_action( 'wp_ajax_buddyforms_data_table_autocomplete', array( $this, 'ajax_get_buddyforms_data_table_autocomplete' ) );
+		add_action( 'wp_ajax_nopriv_buddyforms_data_table_autocomplete', array( $this, 'ajax_get_buddyforms_data_table_autocomplete' ) );
 	}
 
 	public function include_assets() {
@@ -41,7 +43,7 @@ class BuddyFormsFrontendTableDataOutput {
 				//https://datatables.net/reference/option/processing
 				'processing'  => apply_filters( 'buddyforms_datatable_processing', true ),
 				//https://datatables.net/reference/option/searching
-				'searching'   => apply_filters( 'buddyforms_datatable_searching', true ),
+				'searching'   => apply_filters( 'buddyforms_datatable_searching', false ),
 				//https://datatables.net/reference/option/searchDelay
 				'searchDelay' => apply_filters( 'buddyforms_datatable_search_delay', 400 ),
 				//https://datatables.net/reference/option/language
@@ -72,14 +74,15 @@ class BuddyFormsFrontendTableDataOutput {
 			) );
 			wp_enqueue_script( 'buddyforms-datatable-script', BUDDYFORMS_FRONTEND_TABLE_ASSETS . 'js/script.js', array( 'jquery', 'buddyforms-datatable' ), BuddyFormsFrontendTable::getVersion() );
 			wp_enqueue_style( 'buddyforms-datatable-style', BUDDYFORMS_FRONTEND_TABLE_ASSETS . 'css/style.css', array(), BuddyFormsFrontendTable::getVersion() );
-			wp_enqueue_style( 'buddyforms-datatable', BUDDYFORMS_FRONTEND_TABLE_ASSETS . 'DataTables/DataTables/css/jquery.dataTables.min.css', array(), BuddyFormsFrontendTable::getVersion() );
+			wp_enqueue_style( 'buddyforms-datatable-style-jquery', BUDDYFORMS_FRONTEND_TABLE_ASSETS . 'DataTables/DataTables/css/jquery.dataTables.min.css', array(), BuddyFormsFrontendTable::getVersion() );
+			wp_enqueue_script( 'buddyforms-datatable-autocomplete', BUDDYFORMS_FRONTEND_TABLE_ASSETS . 'devbridge.autocomplete/jquery.autocomplete.min.js', array( 'buddyforms-datatable-script' ), BuddyFormsFrontendTable::getVersion() );
 		}
 	}
 
-	public function ajax_get_buddyforms_data_table() {
+	public function ajax_get_buddyforms_data_table_autocomplete() {
 		try {
 			if ( ! ( is_array( $_POST ) && defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
-				return;
+				die();
 			}
 			if ( ! isset( $_POST['action'] ) || ! isset( $_POST['nonce'] ) || empty( $_POST['form_slug'] ) ) {
 				die();
@@ -87,13 +90,125 @@ class BuddyFormsFrontendTableDataOutput {
 			if ( ! wp_verify_nonce( $_POST['nonce'], __DIR__ . 'buddyforms-datatable' ) ) {
 				die();
 			}
-			global $buddyforms;
+
+			$form_slug     = buddyforms_sanitize_slug( $_POST['form_slug'] );
+			$query         = ! empty( $_POST['query'] ) ? sanitize_text_field( $_POST['query'] ) : false;
+			$target_column = isset( $_POST['target_column'] ) && ! empty( $_POST['target_column'][0] ) ? intval( $_POST['target_column'][0] ) : false;
+
+			if ( empty( $query ) || empty( $target_column ) || empty( $form_slug ) ) {
+				die();
+			}
+
+			// if multi site is enabled switch to the form blog id
+			buddyforms_switch_to_form_blog( $form_slug );
+
+			$result              = new stdClass();
+			$result->query       = $query;
+			$result->suggestions = array();
+
+			$all_fields = buddyforms_get_form_fields( $form_slug );
+			if ( empty( $all_fields ) ) {
+				die();
+			}
+			$fields = array();
+			foreach ( $all_fields as $all_field_key => $all_field_data ) {
+				if ( ! empty( $all_field_data['frontend_table'] ) && ! empty( $all_field_data['frontend_table'][0] ) && $all_field_data['frontend_table'][0] === 'enabled' ) {
+					$fields[ $all_field_key ] = $all_field_data;
+				}
+			}
+
+			$fields_keys = array_keys( $fields );
+
+			$cached_key = 'buddyforms_datatable_autocomplete_' . $query . '_' . $target_column;
+			$output     = wp_cache_get( $cached_key, BuddyFormsFrontendTable::getSlug() );
+			if ( $output === false ) {
+				$target_field_id = ! empty( $fields_keys[ $target_column ] ) ? $fields_keys[ $target_column ] : false;
+				if ( ! empty( $target_field_id ) ) {
+					$target_field = $fields[ $target_field_id ];
+					$field_type   = $target_field['type'];
+					//Capture the field value and cache it
+					switch ( $field_type ) {
+						case 'country':
+							if ( ! empty( $target_field['country_list'] ) ) {
+								$country_list = json_decode( $target_field['country_list'], true );
+								if ( ! empty( $country_list ) ) {
+									foreach ( $country_list as $code => $name ) {
+										if ( ! empty( $code ) && ! empty( $name ) ) {
+											if ( stristr( $name, $query ) !== false || stristr( $code, $query ) !== false ) {
+												$output[ $code ] = $name;
+											}
+										}
+									}
+								}
+							}
+							break;
+						case 'state':
+							if ( ! empty( $target_field['state_list'] ) ) {
+								$state_list = json_decode( $target_field['state_list'], true );
+								if ( ! empty( $state_list ) ) {
+									foreach ( $state_list as $key => $state ) {
+										if ( ! empty( $key ) && $key !== 'nostate' && ! empty( $state ) ) {
+											foreach ( $state as $code => $name ) {
+												if ( ! empty( $code ) && ! empty( $name ) ) {
+													if ( stristr( $name, $query ) !== false || stristr( $code, $query ) !== false ) {
+														$output[ $code ] = $name;
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+							break;
+					}
+				}
+				if ( ! empty( $output ) ) {
+					wp_cache_set( $cached_key, $output, BuddyFormsFrontendTable::getSlug() );
+				}
+			}
+			if ( ! empty( $output ) ) {
+				//transform the field value to the correct output
+				foreach ( $output as $data => $value ) {
+					if ( ! empty( $data ) && ! empty( $value ) ) {
+						$item                  = new stdClass();
+						$item->value           = $value;
+						$item->data            = $data;
+						$result->suggestions[] = $item;
+					}
+				}
+			}
+
+			// If multi site is enabled we should restore now to the current blog.
+			if ( buddyforms_is_multisite() ) {
+				restore_current_blog();
+			}
+
+			wp_send_json( $result );
+		} catch ( Exception $ex ) {
+			BuddyFormsFrontendTable::error_log( $ex->getMessage() );
+		}
+		die();
+	}
+
+	public function ajax_get_buddyforms_data_table() {
+		try {
+			if ( ! ( is_array( $_POST ) && defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+				die();
+			}
+			if ( ! isset( $_POST['action'] ) || ! isset( $_POST['nonce'] ) || empty( $_POST['form_slug'] ) ) {
+				die();
+			}
+			if ( ! wp_verify_nonce( $_POST['nonce'], __DIR__ . 'buddyforms-datatable' ) ) {
+				die();
+			}
 
 			$form_slug = buddyforms_sanitize_slug( $_POST['form_slug'] );
 
 			if ( empty( $form_slug ) ) {
-				return;
+				die();
 			}
+
+			global $buddyforms;
 
 			// if multi site is enabled switch to the form blog id
 			buddyforms_switch_to_form_blog( $form_slug );
@@ -122,7 +237,7 @@ class BuddyFormsFrontendTableDataOutput {
 
 			$all_fields = buddyforms_get_form_fields( $form_slug );
 			if ( empty( $all_fields ) ) {
-				return;
+				die();
 			}
 			$fields = array();
 			foreach ( $all_fields as $all_field_key => $all_field_data ) {
@@ -166,7 +281,7 @@ class BuddyFormsFrontendTableDataOutput {
 			}
 
 			foreach ( $target_column as $item_column ) {
-				if ( isset( $item_column['data'] ) && isset( $item_column['search'] ) && isset( $item_column['search']['value'] ) &&  strlen($item_column['search']['value']) > 0 ) {
+				if ( isset( $item_column['data'] ) && isset( $item_column['search'] ) && isset( $item_column['search']['value'] ) && strlen( $item_column['search']['value'] ) > 0 ) {
 					$target_field_id = ! empty( $fields_keys[ $item_column['data'] ] ) ? $fields_keys[ $item_column['data'] ] : false;
 					if ( ! empty( $target_field_id ) ) {
 						$target_field            = $fields[ $target_field_id ];
@@ -235,8 +350,6 @@ class BuddyFormsFrontendTableDataOutput {
 				}
 
 			}
-
-			wp_reset_postdata();
 
 			do_action( 'buddyforms_the_loop_end', $query_args );
 
