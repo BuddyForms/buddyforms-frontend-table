@@ -30,6 +30,7 @@ class BuddyFormsFrontendTableDataOutput {
 			wp_localize_script( 'buddyforms-datatable', 'buddyformsDatatable', array(
 				'ajax'        => admin_url( 'admin-ajax.php' ),
 				'nonce'       => wp_create_nonce( __DIR__ . 'buddyforms-datatable' ),
+				'alwaysOpen'  => apply_filters( 'buddyforms_datatable_always_open', false ),
 				//https://datatables.net/examples/advanced_init/length_menu
 				'lengthMenu'  => apply_filters( 'buddyforms_datatable_length_menu', array( array( 10, 25, 50, 100 ), array( 10, 25, 50, 100 ) ) ),
 				//https://datatables.net/reference/option/pageLength

@@ -69,7 +69,25 @@
 	list-style-type: none;
 	display: flex;
 	width: 100%;
+	min-width: 170px;
 	justify-content: space-around;
 	padding-left: unset;
 	margin-bottom: unset;
+}
+
+.buddyforms_data_table.buddyforms-posts-container ul.dtr-details {
+	list-style-type: none;
+	padding-left: unset;
+	display: inline-block;
+}
+
+.buddyforms_data_table.buddyforms-posts-container ul.dtr-details span.dtr-title {
+	font-weight: bold;
+	color: #454545;
+	display: inline-block;
+	min-width: 150px;
+}
+
+.buddyforms_data_table.buddyforms-posts-container ul.dtr-details span.dtr-data {
+	display: inline-flex;
 }

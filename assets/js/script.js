@@ -1,6 +1,6 @@
 var buddyformsDatatableInstance = {
 	grantedAutocompleteFieldType: ['country', 'state'],
-	initFilterFor: function (targetForm, filterContainer, currentTable) {
+	initFilterFor: function(targetForm, filterContainer, currentTable) {
 		if (!targetForm || !filterContainer || !currentTable) {
 			return false;
 		}
@@ -9,10 +9,10 @@ var buddyformsDatatableInstance = {
 		var headRows = jQuery(currentTable).find('thead th');
 		var filterExample = '<div id="SLUG" class="buddyforms-data-table-filter-child"><p><label for="SLUG"><strong>NAME</strong></label></p><input data-field-type="TYPE" data-form-slug="' + targetForm + '" data-target-column="COLUMN" class="buddyforms-datatable-filter-input" type="search" name="SLUG" id="SLUG"></div>';
 		var targetColumn = 0;
-		jQuery.each(headRows, function () {
+		jQuery.each(headRows, function() {
 			var currentRow = jQuery(this);
 			var isSearchable = currentRow.attr('data-searchable');
-			if (isSearchable && isSearchable.toLowerCase() === "true") {
+			if (isSearchable && isSearchable.toLowerCase() === 'true') {
 				var filterString = filterExample;
 				var targetName = currentRow.text();
 				var targetSlug = currentRow.attr('data-field-slug');
@@ -29,7 +29,7 @@ var buddyformsDatatableInstance = {
 
 		return haveFilters;
 	},
-	init: function () {
+	init: function() {
 		var tableContainer = jQuery('.buddyforms_data_table');
 		if (buddyformsDatatable && tableContainer.length > 0) {
 			var currentTable = tableContainer.find('table[id^="buddyforms-data-table"]');
@@ -56,19 +56,18 @@ var buddyformsDatatableInstance = {
 				}
 
 				var tableOptions = {
-					"responsive": true,
-					"serverSide": true,
-					"orderMulti": true,
-					"ajax": {
-						"type": "POST",
-						"url": buddyformsDatatable.ajax,
-						"data": function (d) {
+					'serverSide': true,
+					'orderMulti': true,
+					'ajax': {
+						'type': 'POST',
+						'url': buddyformsDatatable.ajax,
+						'data': function(d) {
 							d.action = 'buddyforms_data_table';
 							d.nonce = buddyformsDatatable.nonce;
 							d.form_slug = targetForm;
 							d.has_action = hasActionColumn;
-						}
-					}
+						},
+					},
 				};
 				tableOptions['lengthMenu'] = buddyformsDatatable.lengthMenu ? buddyformsDatatable.lengthMenu : [[10, 25, 50], [10, 25, 50]];
 				tableOptions['pageLength'] = buddyformsDatatable.pageLength ? buddyformsDatatable.pageLength : false;
@@ -81,13 +80,25 @@ var buddyformsDatatableInstance = {
 					tableOptions['searchDelay'] = buddyformsDatatable.searchDelay ? buddyformsDatatable.searchDelay : 400;
 				}
 
+				if (buddyformsDatatable.alwaysOpen) {
+					tableOptions['responsive'] = {
+						details: {
+							display: jQuery.fn.dataTable.Responsive.display.childRowImmediate,
+							type: 'none',
+							target: '',
+						},
+					};
+				} else {
+					tableOptions['responsive'] = true;
+				}
+
 				if (buddyformsDatatable.stateSave) {
 					tableOptions['stateSave'] = buddyformsDatatable.stateSave;
-					tableOptions['stateSaveCallback'] = function (settings, data) {
-						localStorage.setItem('DataTables_' + settings.sInstance, JSON.stringify(data))
+					tableOptions['stateSaveCallback'] = function(settings, data) {
+						localStorage.setItem('DataTables_' + settings.sInstance, JSON.stringify(data));
 					};
-					tableOptions['stateLoadCallback'] = function (settings, data) {
-						return JSON.parse(localStorage.getItem('DataTables_' + settings.sInstance))
+					tableOptions['stateLoadCallback'] = function(settings, data) {
+						return JSON.parse(localStorage.getItem('DataTables_' + settings.sInstance));
 					};
 				}
 
@@ -95,35 +106,37 @@ var buddyformsDatatableInstance = {
 
 				if (dataTable && needFilters) {
 					// Apply the search by columns
-					dataTable.columns().every(function () {
+					dataTable.columns().every(function() {
 						var that = this;
 						var config = {
 							serviceUrl: buddyformsDatatable.ajax,
 							autoSelectFirst: true,
 							showNoSuggestionNotice: true,
-							type: "POST",
+							type: 'POST',
 							params: {'action': 'buddyforms_data_table_autocomplete', 'nonce': buddyformsDatatable.nonce, 'form_slug': targetForm, 'target_column': that[0]},
-							onInvalidateSelection: function () {
+							onInvalidateSelection: function() {
 								that.search('').draw();
 							},
-							onSelect: function (suggestion) {
+							onSelect: function(suggestion) {
 								if (suggestion && suggestion.data && that.search() !== suggestion.data) {
 									that.search(suggestion.data).draw();
 								}
-							}
+							},
 						};
-						jQuery.each(jQuery('input[data-target-column="' + that[0] + '"]', tableContainer), function () {
+						jQuery.each(jQuery('input[data-target-column="' + that[0] + '"]', tableContainer), function() {
 							var thisRow = jQuery(this);
 							var currentFieldType = thisRow.attr('data-field-type');
 							if (buddyformsDatatableInstance.grantedAutocompleteFieldType.indexOf(currentFieldType.toLowerCase()) > -1) {
 								thisRow.devbridgeAutocomplete(config);
-							} else {
-								thisRow.on('keyup change clear', function () {
+							}
+							else {
+								thisRow.on('keyup change clear', function() {
 									if (this.value) {
 										if (that.search() !== this.value) {
 											that.search(this.value).draw();
 										}
-									} else {
+									}
+									else {
 										that.search('').draw();
 									}
 								});
@@ -133,9 +146,9 @@ var buddyformsDatatableInstance = {
 				}
 			}
 		}
-	}
+	},
 };
 
-jQuery(document).ready(function () {
+jQuery(document).ready(function() {
 	buddyformsDatatableInstance.init();
 });

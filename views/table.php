@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 $columns          = BuddyFormsFrontendTableDataOutput::get_table_columns( $form_slug );
 $columns['actions'] = array( 'frontend_table_sortable' => array( false ), 'frontend_table_filter' => array( false ), 'frontend_table' => array( 'enabled' ), 'name' => 'Neem contact op', 'type' => 'edit' );
-$footer_enabled   = true;
+$footer_enabled   = apply_filters( 'buddyforms_datatable_enabled_footer', true );
 
 $need_filter_container = false;
 $initial_order         = '';
