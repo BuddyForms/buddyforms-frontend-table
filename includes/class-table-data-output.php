@@ -21,13 +21,6 @@ class BuddyFormsFrontendTableDataOutput {
 		add_action( 'wp_ajax_nopriv_buddyforms_data_table', array( $this, 'ajax_get_buddyforms_data_table' ) );
 		add_action( 'wp_ajax_buddyforms_data_table_autocomplete', array( $this, 'ajax_get_buddyforms_data_table_autocomplete' ) );
 		add_action( 'wp_ajax_nopriv_buddyforms_data_table_autocomplete', array( $this, 'ajax_get_buddyforms_data_table_autocomplete' ) );
-//		add_filter( 'buddyforms_datatable_action_html', array( $this, 'buddyforms_datatable_action_column' ), 10, 5 );
-	}
-
-	public function buddyforms_datatable_action_column( $action_html, $post_id, $form_slug, $fields, $entry_metas ) {
-
-
-		return "<h3>UUUU</h3>";
 	}
 
 	public function include_assets() {
@@ -386,14 +379,14 @@ class BuddyFormsFrontendTableDataOutput {
 						if ( $has_action ) {
 							ob_start();
 							echo '<div class="action"><div class="meta">';
-//							global $post;
-//							$post = get_post( $post_id, OBJECT );
-//							setup_postdata( $post );
-//							buddyforms_post_entry_actions( $form_slug );
+							global $post;
+							$post = get_post( $post_id, OBJECT );
+							setup_postdata( $post );
+							buddyforms_post_entry_actions( $form_slug );
 							do_action( 'buddyforms_the_loop_after_actions', $post_id, $form_slug );
 							echo '</div></div>';
 							$action_html = ob_get_clean();
-//							wp_reset_postdata();
+							wp_reset_postdata();
 							$action_html    = apply_filters( 'buddyforms_datatable_action_html', $action_html, $post_id, $form_slug, $fields, $entry_metas );
 							$final_result[] = $action_html;
 						}

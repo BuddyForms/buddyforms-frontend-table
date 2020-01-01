@@ -42,7 +42,7 @@ class BuddyFormsFrontendTable {
 	/**
 	 * Instance of this class
 	 *
-	 * @var $instance buddyforms_geo_my_wp
+	 * @var $instance BuddyFormsFrontendTable
 	 */
 	protected static $instance = null;
 
