@@ -378,16 +378,19 @@ class BuddyFormsFrontendTableDataOutput {
 							$final_result[] = isset( $entry_meta['value'] ) ? $entry_meta['value'] : '';
 						}
 						if ( $has_action ) {
+							$include_edit_action = apply_filters( 'buddyforms_datatable_include_bf_action', true, $post_id, $form_slug, $fields, $entry_metas );
 							ob_start();
 							echo '<div class="action"><div class="meta">';
-							global $post;
-							$post = get_post( $post_id, OBJECT );
-							setup_postdata( $post );
-							buddyforms_post_entry_actions( $form_slug );
+							if ( $include_edit_action ) {
+								global $post;
+								$post = get_post( $post_id, OBJECT );
+								setup_postdata( $post );
+								buddyforms_post_entry_actions( $form_slug );
+								wp_reset_postdata();
+							}
 							do_action( 'buddyforms_the_loop_after_actions', $post_id, $form_slug );
 							echo '</div></div>';
-							$action_html = ob_get_clean();
-							wp_reset_postdata();
+							$action_html    = ob_get_clean();
 							$action_html    = apply_filters( 'buddyforms_datatable_action_html', $action_html, $post_id, $form_slug, $fields, $entry_metas );
 							$final_result[] = $action_html;
 						}

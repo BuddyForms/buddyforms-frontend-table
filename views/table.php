@@ -42,7 +42,7 @@ $thead .= '</tr>';
 			<div class="buddyforms-data-table-filter-container" id="buddyforms-data-table-filter-container-<?php echo $form_slug ?>">
 			</div>
 		<?php endif; ?>
-		<table id="buddyforms-data-table-<?php echo $form_slug ?>" class="display" style="width:100%" data-form-slug="<?php echo $form_slug ?>" <?php echo $initial_order ?>>
+		<table id="buddyforms-data-table-<?php echo $form_slug ?>" class="display" style="width:100%; display: none" data-form-slug="<?php echo $form_slug ?>" <?php echo $initial_order ?>>
 			<thead>
 			<?php echo $thead ?>
 			</thead>

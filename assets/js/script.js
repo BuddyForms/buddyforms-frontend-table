@@ -88,7 +88,8 @@ var buddyformsDatatableInstance = {
 							target: '',
 						},
 					};
-				} else {
+				}
+				else {
 					tableOptions['responsive'] = true;
 				}
 
@@ -101,6 +102,10 @@ var buddyformsDatatableInstance = {
 						return JSON.parse(localStorage.getItem('DataTables_' + settings.sInstance));
 					};
 				}
+
+				jQuery(document).on('preInit.dt', function() {
+					currentTable.show();
+				});
 
 				var dataTable = jQuery(currentTable).DataTable(tableOptions);
 
@@ -123,6 +128,7 @@ var buddyformsDatatableInstance = {
 								}
 							},
 						};
+
 						jQuery.each(jQuery('input[data-target-column="' + that[0] + '"]', tableContainer), function() {
 							var thisRow = jQuery(this);
 							var currentFieldType = thisRow.attr('data-field-type');
