@@ -2,9 +2,9 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-$columns          = BuddyFormsFrontendTableDataOutput::get_table_columns( $form_slug );
+$columns            = BuddyFormsFrontendTableDataOutput::get_table_columns( $form_slug );
 $columns['actions'] = array( 'frontend_table_sortable' => array( false ), 'frontend_table_filter' => array( false ), 'frontend_table' => array( 'enabled' ), 'name' => 'Neem contact op', 'type' => 'edit' );
-$footer_enabled   = apply_filters( 'buddyforms_datatable_enabled_footer', true );
+$footer_enabled     = apply_filters( 'buddyforms_datatable_enabled_footer', true, $form_slug );
 
 $need_filter_container = false;
 $initial_order         = '';
@@ -15,8 +15,9 @@ foreach ( $columns as $column_id => $columns_data ) {
 	$is_filterable_string = '';
 	$is_sortable          = ( ! empty( $columns_data['frontend_table_sortable'] ) && ! empty( $columns_data['frontend_table_sortable'][0] ) && $columns_data['frontend_table_sortable'][0] === 'enabled' );
 	if ( $is_sortable && empty( $initial_order ) ) {
-		$initial_order = "data-order='[[ " . $i . ", \"asc\" ]]'";
+		$initial_order = '[[ ' . $i . ', \"asc\" ]]';
 	}
+	$initial_order = sprintf( "data-order='%s'", apply_filters( 'buddyforms_datatable_default_order', $initial_order, $form_slug ) );
 	if ( ! $is_sortable ) {
 		$sortable_string = 'data-sortable="false"';
 	}
