@@ -29,6 +29,29 @@ var buddyformsDatatableInstance = {
 
 		return haveFilters;
 	},
+	childRowImmediate: function(row, update, render) {
+		if ((!update && row.child.isShown()) || !row.responsive.hasHidden()) {
+			// User interaction and the row is show, or nothing to show
+			row.child(false);
+			jQuery(row.node()).removeClass('parent');
+			jQuery(row.node()).unbind('click');
+			return false;
+		}
+		else {
+			// Display
+			var ren = render();
+			row.child(ren, 'child').show();
+			jQuery(row.node()).addClass('parent');
+			if (jQuery(row.node()).hasClass('odd')) {
+				jQuery(ren).parent().parent().addClass('odd');
+			}
+			else {
+				jQuery(ren).parent().parent().addClass('even');
+			}
+
+			return true;
+		}
+	},
 	init: function() {
 		var tableContainer = jQuery('.buddyforms_data_table');
 		if (buddyformsDatatable && tableContainer.length > 0) {
@@ -83,8 +106,8 @@ var buddyformsDatatableInstance = {
 				if (buddyformsDatatable.alwaysOpen) {
 					tableOptions['responsive'] = {
 						details: {
-							display: jQuery.fn.dataTable.Responsive.display.childRowImmediate,
-							type: 'none',
+							display: buddyformsDatatableInstance.childRowImmediate,
+							type: 'inline',
 							target: '',
 						},
 					};
