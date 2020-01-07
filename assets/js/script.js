@@ -29,12 +29,28 @@ var buddyformsDatatableInstance = {
 
 		return haveFilters;
 	},
+	tableAll: function(options) {
+		options = jQuery.extend({
+			tableClass: '',
+		}, options);
+
+		return function(api, rowIdx, columns) {
+			var data = jQuery.map(columns, function(col) {
+				return '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' + col.columnIndex + '">' +
+					'<td class="header-col">' + col.title + ':' + '</td> ' +
+					'<td class="data-col">' + col.data + '</td>' +
+					'</tr>';
+			}).join('');
+			jQuery(api.cell(rowIdx, 0).node()).parent().hide();
+			return jQuery('<table class="' + options.tableClass + ' dtr-details" width="100%"/>').append(data);
+		};
+	},
 	childRowImmediate: function(row, update, render) {
 		if ((!update && row.child.isShown()) || !row.responsive.hasHidden()) {
 			// User interaction and the row is show, or nothing to show
 			row.child(false);
 			jQuery(row.node()).removeClass('parent');
-			jQuery(row.node()).unbind('click');
+			jQuery(row.node()).unbind('*');
 			return false;
 		}
 		else {
@@ -54,7 +70,7 @@ var buddyformsDatatableInstance = {
 	},
 	init: function() {
 		var tableContainer = jQuery('.buddyforms_data_table');
-		if (buddyformsDatatable && tableContainer.length > 0) {
+		if (buddyformsDatatable && tableContainer.length > 0 && BuddyFormsHooks) {
 			var currentTable = tableContainer.find('table[id^="buddyforms-data-table"]');
 			if (currentTable && currentTable.length > 0) {
 				var targetForm = currentTable.attr('data-form-slug');
@@ -81,6 +97,8 @@ var buddyformsDatatableInstance = {
 				var tableOptions = {
 					'serverSide': true,
 					'orderMulti': true,
+					'fixedColumns': true,
+					'autoWidth': false,
 					'ajax': {
 						'type': 'POST',
 						'url': buddyformsDatatable.ajax,
@@ -99,6 +117,14 @@ var buddyformsDatatableInstance = {
 				tableOptions['processing'] = buddyformsDatatable.processing ? buddyformsDatatable.processing : true;
 				tableOptions['searching'] = buddyformsDatatable.searching ? buddyformsDatatable.searching : false;
 
+				if (buddyformsDatatable.language) {
+					tableOptions['language'] = buddyformsDatatable.language;
+				}
+
+				if (buddyformsDatatable.dom) {
+					tableOptions['dom'] = buddyformsDatatable.dom;
+				}
+
 				if (buddyformsDatatable.searching) {
 					tableOptions['searchDelay'] = buddyformsDatatable.searchDelay ? buddyformsDatatable.searchDelay : 400;
 				}
@@ -107,10 +133,13 @@ var buddyformsDatatableInstance = {
 					tableOptions['responsive'] = {
 						details: {
 							display: buddyformsDatatableInstance.childRowImmediate,
-							type: 'inline',
+							type: 'column',
 							target: '',
 						},
 					};
+					if (buddyformsDatatable.childFullTable) {
+						tableOptions['responsive'].details.renderer = buddyformsDatatableInstance.tableAll();
+					}
 				}
 				else {
 					tableOptions['responsive'] = true;
@@ -131,6 +160,24 @@ var buddyformsDatatableInstance = {
 				});
 
 				var dataTable = jQuery(currentTable).DataTable(tableOptions);
+
+				BuddyFormsHooks.doAction('buddyforms-datatable:init', [dataTable]);
+
+				if (dataTable && buddyformsDatatable.alwaysOpen && buddyformsDatatable.childFullTable) {
+					//Show or hide the rows when the childFullTable is enabled
+					dataTable.on('responsive-resize', function(e, datatable, columns) {
+						var oneIsHide = columns.filter(function(curr) {
+							return curr === false;
+						});
+						var existHidden = oneIsHide.length > 0;
+						if (!existHidden) {
+							currentTable.find('tbody tr[role="row"]').show();
+						}
+						else {
+							currentTable.find('tbody tr[role="row"]').hide();
+						}
+					});
+				}
 
 				if (dataTable && needFilters) {
 					// Apply the search by columns

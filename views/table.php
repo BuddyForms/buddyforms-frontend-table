@@ -2,9 +2,10 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-$columns            = BuddyFormsFrontendTableDataOutput::get_table_columns( $form_slug );
-$columns['actions'] = array( 'frontend_table_sortable' => array( false ), 'frontend_table_filter' => array( false ), 'frontend_table' => array( 'enabled' ), 'name' => 'Neem contact op', 'type' => 'edit' );
-$footer_enabled     = apply_filters( 'buddyforms_datatable_enabled_footer', true, $form_slug );
+$columns = BuddyFormsFrontendTableDataOutput::get_table_columns( $form_slug );
+
+$columns        = apply_filters( 'buddyforms_datatable_columns', $columns, $form_slug );
+$footer_enabled = apply_filters( 'buddyforms_datatable_enabled_footer', true, $form_slug );
 
 $need_filter_container = false;
 $initial_order         = '';
@@ -30,7 +31,7 @@ foreach ( $columns as $column_id => $columns_data ) {
 	}
 	if ( ! empty( $columns_data ) ) {
 		if ( ! empty( $columns_data['frontend_table'] ) && ! empty( $columns_data['frontend_table'][0] ) && $columns_data['frontend_table'][0] === 'enabled' ) {
-			$thead .= ' <th data-priority="' . $i . '" ' . $is_filterable_string . ' ' . $sortable_string . ' data-field-slug="' . $column_id . '" data-field-type="' . $columns_data['type'] . '">' . esc_html( $columns_data['name'] ) . '</th>';
+			$thead .= ' <th data-priority="' . $i . '" ' . $is_filterable_string . ' ' . $sortable_string . ' data-field-slug="' . $column_id . '" data-field-type="' . $columns_data['type'] . '" ' . apply_filters( 'buddyforms_datatable_th_attr', '', $form_slug, $column_id, $columns_data ) . ' class="' . apply_filters( 'buddyforms_datatable_th_class', '', $form_slug, $column_id, $columns_data ) . '" >' . esc_html( $columns_data['name'] ) . '</th>';
 		}
 	}
 	$i ++;
@@ -43,7 +44,7 @@ $thead .= '</tr>';
 			<div class="buddyforms-data-table-filter-container" id="buddyforms-data-table-filter-container-<?php echo $form_slug ?>">
 			</div>
 		<?php endif; ?>
-		<table id="buddyforms-data-table-<?php echo $form_slug ?>" class="display" style="width:100%; display: none" data-form-slug="<?php echo $form_slug ?>" <?php echo $initial_order ?>>
+		<table id="buddyforms-data-table-<?php echo $form_slug ?>" class="display <?php echo $form_slug ?>" style="width:100%; display: none" data-form-slug="<?php echo $form_slug ?>" <?php echo $initial_order ?>>
 			<thead>
 			<?php echo $thead ?>
 			</thead>

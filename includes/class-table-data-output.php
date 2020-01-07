@@ -31,6 +31,7 @@ class BuddyFormsFrontendTableDataOutput {
 				'ajax'        => admin_url( 'admin-ajax.php' ),
 				'nonce'       => wp_create_nonce( __DIR__ . 'buddyforms-datatable' ),
 				'alwaysOpen'  => apply_filters( 'buddyforms_datatable_always_open', false ),
+				'childFullTable'  => apply_filters( 'buddyforms_datatable_always_open_child_full_table', false ),
 				//https://datatables.net/examples/advanced_init/length_menu
 				'lengthMenu'  => apply_filters( 'buddyforms_datatable_length_menu', array( array( 10, 25, 50, 100 ), array( 10, 25, 50, 100 ) ) ),
 				//https://datatables.net/reference/option/pageLength
@@ -47,6 +48,8 @@ class BuddyFormsFrontendTableDataOutput {
 				'searching'   => apply_filters( 'buddyforms_datatable_searching', true ),
 				//https://datatables.net/reference/option/searchDelay
 				'searchDelay' => apply_filters( 'buddyforms_datatable_search_delay', 400 ),
+				//https://datatables.net/reference/option/dom
+				'dom' => apply_filters( 'buddyforms_datatable_dom', '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-tl ui-corner-tr"flr>t<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-bl ui-corner-br"ip>' ),
 				//https://datatables.net/reference/option/language
 				'language'    => apply_filters( 'buddyforms_datatable_language', array(
 					"decimal"        => "",
