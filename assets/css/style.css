@@ -6,18 +6,6 @@
 	flex-flow: row wrap;
 }
 
-.buddyforms-data-table-filter-child {
-	margin-left: 5px;
-}
-
-.buddyforms-data-table-filter-container p {
-	margin-bottom: 10px;
-}
-
-.buddyforms-data-table-filter-child.example {
-	display: none;
-}
-
 .fg-toolbar.ui-toolbar.ui-widget-header {
 	padding: 10px;
 }
@@ -122,12 +110,20 @@
 }
 
 .buddyforms_data_table.buddyforms-posts-container .dataTables_wrapper .dataTables_length {
-	float: right;
+	float: left;
 }
 
 .buddyforms_data_table.buddyforms-posts-container .dataTables_wrapper .dataTables_filter {
 	float: left;
 	text-align: left;
+	display: block;
+	margin-left: 5px;
+}
+
+.buddyforms_data_table.buddyforms-posts-container .dataTables_wrapper .dataTables_filter input {
+	margin-left: unset;
+	display: block;
+	min-width: 300px;
 }
 
 @media screen and (max-width: 640px) {
@@ -135,6 +131,10 @@
 		margin-top: 0.5em;
 		float: none;
 		text-align: center;
+		margin-left: unset;
+	}
+	.buddyforms_data_table.buddyforms-posts-container .dataTables_wrapper .dataTables_filter label {
+		text-align: left;
 	}
 }
 
@@ -143,6 +143,15 @@
 		float: none;
 		text-align: center;
 	}
+
+	.buddyforms_data_table.buddyforms-posts-container .ui-button.ui-state-default.previous,
+	.buddyforms_data_table.buddyforms-posts-container .ui-button.ui-state-default.next{
+		display: none;
+	}
+}
+
+.buddyforms_data_table.buddyforms-posts-container table .DataTables_sort_wrapper {
+	text-align: center;
 }
 
 /* Style for the childFullTable */
@@ -161,56 +170,3 @@
 	border-top: 1px solid #fff;
 }
 
-/* Custom styles */
-
-.buddyforms_data_table.buddyforms-posts-container table .DataTables_sort_wrapper {
-	text-align: center;
-}
-
-.jupiterx-site .elementor-column-gap-default > .elementor-row > .elementor-element-61e00d4 > .elementor-element-populated,
-.jupiterx-site .elementor-column-gap-default > .elementor-row > .elementor-element-dcc54c1 > .elementor-element-populated {
-	padding: unset;
-}
-
-.buddyforms_data_table.buddyforms-posts-container table.dataTable table.dtr-details,
-.buddyforms_data_table.buddyforms-posts-container table.dataTable table.dtr-details tr,
-.buddyforms_data_table.buddyforms-posts-container table.dataTable table.dtr-details tbody tr,
-.buddyforms_data_table.buddyforms-posts-container table.dataTable table.dtr-details tbody td,
-.buddyforms_data_table.buddyforms-posts-container table.dataTable table.dtr-details td {
-	border: none;
-}
-
-.buddyforms_data_table.buddyforms-posts-container table.dataTable .child.even table.dtr-details tbody .data-col {
-	background-color: #fff;
-	border-bottom: 2px solid #fff;
-}
-
-.buddyforms_data_table.buddyforms-posts-container table.dataTable.display.test-taxski tbody tr.odd, .buddyforms_data_table.buddyforms-posts-container table tbody tr.child.odd {
-	background-color: #e5f3f4;
-}
-
-.buddyforms_data_table.buddyforms-posts-container table.dataTable.display.test-taxski tbody tr.odd > .sorting_1, .buddyforms_data_table.buddyforms-posts-container table.dataTable.order-column.stripe tbody tr.odd > .sorting_1 {
-	background-color: #e5f3f4;
-}
-
-.buddyforms_data_table.buddyforms-posts-container table.dataTable .child.odd table.dtr-details tbody .data-col {
-	background-color: #e5f3f4;
-}
-
-.buddyforms_data_table.buddyforms-posts-container table.dataTable table.dtr-details tbody .data-col {
-	padding-left: 0.5em;
-	border-bottom: 2px solid #e5f3f4;
-}
-
-.buddyforms_data_table.buddyforms-posts-container table.dataTable table.dtr-details tbody .header-col {
-	background-color: #3199d0;
-	width: 40%;
-	border-bottom: 2px solid #3199d0;
-	font-weight: 500;
-	color: #fff;
-	padding-left: 0.5em;
-}
-
-.buddyforms_data_table.buddyforms-posts-container table.dataTable table.dtr-details tbody tr {
-	background-color: #fff;
-}

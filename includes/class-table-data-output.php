@@ -49,7 +49,7 @@ class BuddyFormsFrontendTableDataOutput {
 				//https://datatables.net/reference/option/searchDelay
 				'searchDelay' => apply_filters( 'buddyforms_datatable_search_delay', 400 ),
 				//https://datatables.net/reference/option/dom
-				'dom' => apply_filters( 'buddyforms_datatable_dom', '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-tl ui-corner-tr"flr>t<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-bl ui-corner-br"ip>' ),
+				'dom' => apply_filters( 'buddyforms_datatable_dom', '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-tl ui-corner-tr"f>t<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-bl ui-corner-br"rlp>' ),
 				//https://datatables.net/reference/option/language
 				'language'    => apply_filters( 'buddyforms_datatable_language', array(
 					"decimal"        => "",

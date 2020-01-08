@@ -7,7 +7,7 @@ var buddyformsDatatableInstance = {
 
 		var haveFilters = false;
 		var headRows = jQuery(currentTable).find('thead th');
-		var filterExample = '<div id="SLUG" class="buddyforms-data-table-filter-child"><p><label for="SLUG"><strong>NAME</strong></label></p><input data-field-type="TYPE" data-form-slug="' + targetForm + '" data-target-column="COLUMN" class="buddyforms-datatable-filter-input" type="search" name="SLUG" id="SLUG"></div>';
+		var filterExample = '<div id="SLUG" class="buddyforms-data-table-filter-child dataTables_filter"><label for="SLUG">NAME<input data-field-type="TYPE" data-form-slug="' + targetForm + '" data-target-column="COLUMN" class="buddyforms-datatable-filter-input" type="search" name="SLUG" id="SLUG"></label></div>';
 		var targetColumn = 0;
 		jQuery.each(headRows, function() {
 			var currentRow = jQuery(this);
@@ -21,7 +21,8 @@ var buddyformsDatatableInstance = {
 				filterString = filterString.replace(/NAME/g, targetName);
 				filterString = filterString.replace(/TYPE/g, targetType);
 				filterString = filterString.replace(/COLUMN/g, targetColumn);
-				filterContainer.append(filterString);
+				var targetContent = filterContainer.find('.ui-toolbar.ui-widget-header').first();
+				targetContent.append(filterString);
 				haveFilters = true;
 			}
 			targetColumn++;
@@ -90,10 +91,6 @@ var buddyformsDatatableInstance = {
 				var filterContainer = tableContainer.find('.buddyforms-data-table-filter-container');
 				var needFilters = (filterContainer && filterContainer.length > 0);
 
-				if (needFilters) {
-					this.initFilterFor(targetForm, filterContainer, currentTable);
-				}
-
 				var tableOptions = {
 					'serverSide': true,
 					'orderMulti': true,
@@ -156,6 +153,9 @@ var buddyformsDatatableInstance = {
 				}
 
 				jQuery(document).on('preInit.dt', function() {
+					if (needFilters) {
+						buddyformsDatatableInstance.initFilterFor(targetForm, tableContainer, currentTable);
+					}
 					currentTable.show();
 				});
 
