@@ -22,7 +22,7 @@ var buddyformsDatatableInstance = {
 				filterString = filterString.replace(/TYPE/g, targetType);
 				filterString = filterString.replace(/COLUMN/g, targetColumn);
 				var targetContent = filterContainer.find('.ui-toolbar.ui-widget-header').first();
-				targetContent.append(filterString);
+				targetContent.prepend(filterString);
 				haveFilters = true;
 			}
 			targetColumn++;
