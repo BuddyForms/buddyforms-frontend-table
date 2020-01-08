@@ -37,6 +37,8 @@ foreach ( $columns as $column_id => $columns_data ) {
 	$i ++;
 }
 $thead .= '</tr>';
+global $wp;
+$current_page = $wp->request;
 ?>
 <div id="buddyforms-data-table-view-<?php echo $form_slug ?>" class="buddyforms_data_table buddyforms-posts-container">
 	<?php if ( ! empty( $columns ) ) : ?>
@@ -44,7 +46,7 @@ $thead .= '</tr>';
 			<div class="buddyforms-data-table-filter-container" id="buddyforms-data-table-filter-container-<?php echo $form_slug ?>">
 			</div>
 		<?php endif; ?>
-		<table id="buddyforms-data-table-<?php echo $form_slug ?>" class="display <?php echo $form_slug ?>" style="width:100%; display: none" data-form-slug="<?php echo $form_slug ?>" <?php echo $initial_order ?>>
+		<table id="buddyforms-data-table-<?php echo $form_slug ?>" class="display <?php echo $form_slug ?>" style="width:100%; display: none" data-current-page="<?php echo esc_attr( $current_page ) ?>" data-form-slug="<?php echo $form_slug ?>" <?php echo $initial_order ?>>
 			<thead>
 			<?php echo $thead ?>
 			</thead>

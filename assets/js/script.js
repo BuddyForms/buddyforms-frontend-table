@@ -38,7 +38,7 @@ var buddyformsDatatableInstance = {
 		return function(api, rowIdx, columns) {
 			var data = jQuery.map(columns, function(col) {
 				return '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' + col.columnIndex + '">' +
-					'<td class="header-col">' + col.title + ':' + '</td> ' +
+					'<td class="header-col">' + col.title + '</td> ' +
 					'<td class="data-col">' + col.data + '</td>' +
 					'</tr>';
 			}).join('');
@@ -75,6 +75,7 @@ var buddyformsDatatableInstance = {
 			var currentTable = tableContainer.find('table[id^="buddyforms-data-table"]');
 			if (currentTable && currentTable.length > 0) {
 				var targetForm = currentTable.attr('data-form-slug');
+				var currentPage = currentTable.attr('data-current-page');
 				if (!targetForm) {
 					return;
 				}
@@ -104,6 +105,7 @@ var buddyformsDatatableInstance = {
 							d.nonce = buddyformsDatatable.nonce;
 							d.form_slug = targetForm;
 							d.has_action = hasActionColumn;
+							d.page = currentPage;
 						},
 					},
 				};

@@ -28,30 +28,30 @@ class BuddyFormsFrontendTableDataOutput {
 			wp_enqueue_script( 'buddyforms-datatable', BUDDYFORMS_FRONTEND_TABLE_ASSETS . 'DataTables/datatables.min.js', array( 'jquery' ), BuddyFormsFrontendTable::getVersion() );
 			$posts_per_page = apply_filters( 'buddyforms_user_posts_query_args_posts_per_page', 10 );
 			wp_localize_script( 'buddyforms-datatable', 'buddyformsDatatable', array(
-				'ajax'        => admin_url( 'admin-ajax.php' ),
-				'nonce'       => wp_create_nonce( __DIR__ . 'buddyforms-datatable' ),
-				'alwaysOpen'  => apply_filters( 'buddyforms_datatable_always_open', false ),
-				'childFullTable'  => apply_filters( 'buddyforms_datatable_always_open_child_full_table', false ),
+				'ajax'           => admin_url( 'admin-ajax.php' ),
+				'nonce'          => wp_create_nonce( __DIR__ . 'buddyforms-datatable' ),
+				'alwaysOpen'     => apply_filters( 'buddyforms_datatable_always_open', false ),
+				'childFullTable' => apply_filters( 'buddyforms_datatable_always_open_child_full_table', false ),
 				//https://datatables.net/examples/advanced_init/length_menu
-				'lengthMenu'  => apply_filters( 'buddyforms_datatable_length_menu', array( array( 10, 25, 50, 100 ), array( 10, 25, 50, 100 ) ) ),
+				'lengthMenu'     => apply_filters( 'buddyforms_datatable_length_menu', array( array( 10, 25, 50, 100 ), array( 10, 25, 50, 100 ) ) ),
 				//https://datatables.net/reference/option/pageLength
-				'pageLength'  => apply_filters( 'buddyforms_datatable_page_length', $posts_per_page ),
+				'pageLength'     => apply_filters( 'buddyforms_datatable_page_length', $posts_per_page ),
 				//https://datatables.net/reference/option/info
-				'info'        => apply_filters( 'buddyforms_datatable_info', false ),
+				'info'           => apply_filters( 'buddyforms_datatable_info', false ),
 				//https://datatables.net/reference/option/paging
-				'paging'      => apply_filters( 'buddyforms_datatable_paging', true ),
+				'paging'         => apply_filters( 'buddyforms_datatable_paging', true ),
 				//https://datatables.net/reference/option/stateSave
-				'stateSave'   => apply_filters( 'buddyforms_datatable_state_false', false ),
+				'stateSave'      => apply_filters( 'buddyforms_datatable_state_false', false ),
 				//https://datatables.net/reference/option/processing
-				'processing'  => apply_filters( 'buddyforms_datatable_processing', true ),
+				'processing'     => apply_filters( 'buddyforms_datatable_processing', true ),
 				//https://datatables.net/reference/option/searching
-				'searching'   => apply_filters( 'buddyforms_datatable_searching', true ),
+				'searching'      => apply_filters( 'buddyforms_datatable_searching', true ),
 				//https://datatables.net/reference/option/searchDelay
-				'searchDelay' => apply_filters( 'buddyforms_datatable_search_delay', 400 ),
+				'searchDelay'    => apply_filters( 'buddyforms_datatable_search_delay', 400 ),
 				//https://datatables.net/reference/option/dom
-				'dom' => apply_filters( 'buddyforms_datatable_dom', '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-tl ui-corner-tr"f>t<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-bl ui-corner-br"rlp>' ),
+				'dom'            => apply_filters( 'buddyforms_datatable_dom', '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-tl ui-corner-tr"f>t<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-bl ui-corner-br"rlp>' ),
 				//https://datatables.net/reference/option/language
-				'language'    => apply_filters( 'buddyforms_datatable_language', array(
+				'language'       => apply_filters( 'buddyforms_datatable_language', array(
 					"decimal"        => "",
 					"emptyTable"     => __( "No data available in table", 'buddyforms-frontend-table' ),
 					"info"           => __( "Showing _START_ to _END_ of _TOTAL_ entries", 'buddyforms-frontend-table' ),
@@ -230,24 +230,71 @@ class BuddyFormsFrontendTableDataOutput {
 			// if multi site is enabled switch to the form blog id
 			buddyforms_switch_to_form_blog( $form_slug );
 
-			$has_action   = isset( $_POST['has_action'] ) ? boolval( $_POST['has_action'] ) : false;
-			$draw         = isset( $_POST['draw'] ) ? intval( $_POST['draw'] ) : 1;
-			$start        = isset( $_POST['start'] ) ? intval( $_POST['start'] ) : 0;
-			$length       = isset( $_POST['length'] ) ? intval( $_POST['length'] ) : apply_filters( 'buddyforms_user_posts_query_args_posts_per_page', 10 );
-			$search_value = isset( $_POST['search'] ) && ! empty( $_POST['search']['value'] ) ? sanitize_text_field( $_POST['search']['value'] ) : false;
+			$has_action        = isset( $_POST['has_action'] ) ? boolval( $_POST['has_action'] ) : false;
+			$draw              = isset( $_POST['draw'] ) ? intval( $_POST['draw'] ) : 1;
+			$start             = isset( $_POST['start'] ) ? intval( $_POST['start'] ) : 0;
+			$length            = isset( $_POST['length'] ) ? intval( $_POST['length'] ) : apply_filters( 'buddyforms_datatable_user_posts_query_args_posts_per_page', 10 );
+			$search_value      = isset( $_POST['search'] ) && ! empty( $_POST['search']['value'] ) ? sanitize_text_field( $_POST['search']['value'] ) : false;
+			$current_page_path = isset( $_POST['page'] ) && ! empty( $_POST['page'] ) ? sanitize_text_field( $_POST['page'] ) : false;
+
+			$granted_shortcodes = array( 'bf_user_posts_list' );
+			$args               = array();
+			if ( ! empty( $current_page_path ) ) {
+				$current_page = get_page_by_path( $current_page_path );
+				if ( ! empty( $current_page ) ) {
+					$current_page_content = $current_page->post_content;
+					if ( ! empty( $current_page_content ) ) {
+						$pattern = get_shortcode_regex();
+						if ( preg_match_all( '/' . $pattern . '/s', $current_page_content . $current_page_content, $matches ) ) {
+							$keys   = array();
+							$result = array();
+							foreach ( $matches[2] as $key => $value ) {
+								if ( ! empty( $matches[2][ $key ] ) && in_array( $matches[2][ $key ], $granted_shortcodes ) ) {
+									if ( ! empty( $matches[3][ $key ] ) ) {
+										$target_attr = $matches[3][ $key ];
+										$get         = '';
+										$target_attr = str_replace( "\"", "", $target_attr );
+										$get         = str_replace( " ", "&", $target_attr );
+										parse_str( $get, $output );
+										$keys                          = array_unique( array_merge( $keys, array_keys( $output ) ) );
+										$args[ $matches[2][ $key ] ][] = $output;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// Enable other plugins to manipulate the arguments used for query the posts
+			$args = apply_filters( 'buddyforms_the_loop_args', $args );
+
+			$attr = shortcode_atts( array(
+				'author'              => '',
+				'post_type'           => '',
+				'form_slug'           => '',
+				'id'                  => '',
+				'post_parent'         => 0,
+				'query_option'        => '',
+				'list_posts_option'   => '',
+				'user_logged_in_only' => 'logged_in_only',
+				'meta_key'            => '',
+				'meta_value'          => '',
+				'meta_compare'        => '=',
+				'list_posts_style'    => '',
+				'posts_per_page'      => '10',
+				'posts_status'        => array( 'publish', 'pending', 'draft', 'future' )
+			), $args );
 
 			$result = array( 'draw' => $draw, 'recordsTotal' => 0, 'recordsFiltered' => 0, 'data' => array() );
 
 			$post_type = $buddyforms[ $form_slug ]['post_type'];
 
-			$post_status = apply_filters( 'buddyforms_shortcode_the_loop_post_status', array(
+			$post_status = apply_filters( 'buddyforms_datatable_the_loop_post_status', array(
 				'publish',
-				'pending',
-				'draft',
-				'future'
 			), $form_slug );
 
-			$the_author_id = apply_filters( 'buddyforms_the_loop_author_id', get_current_user_id(), $form_slug );
+			$the_author_id = apply_filters( 'buddyforms_datatable_the_loop_author_id', get_current_user_id(), $form_slug );
 
 			if ( ! $the_author_id ) {
 				$post_status = array( 'publish' );
@@ -362,12 +409,12 @@ class BuddyFormsFrontendTableDataOutput {
 				$query_args['author'] = $the_author_id;
 			}
 
-			$query_args = apply_filters( 'buddyforms_user_posts_query_args', $query_args );
+			$query_args = apply_filters( 'buddyforms_datatable_posts_query_args', $query_args );
 
 			do_action( 'buddyforms_the_loop_start', $query_args );
 
 			$the_lp_query = new WP_Query( $query_args );
-			$the_lp_query = apply_filters( 'buddyforms_the_lp_query', $the_lp_query );
+			$the_lp_query = apply_filters( 'buddyforms_datatable_the_lp_query', $the_lp_query );
 
 			if ( $the_lp_query->have_posts() ) {
 				$posts                     = $the_lp_query->get_posts();
