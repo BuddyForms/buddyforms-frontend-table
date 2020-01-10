@@ -198,7 +198,7 @@ class BuddyFormsFrontendTableDataOutput {
 		switch ( $field_type ) {
 			case 'time':
 			case 'date':
-				$cast = 'DATETIME';
+				$cast = 'DATE';
 				break;
 			default:
 				$cast = 'CHAR';
@@ -332,13 +332,12 @@ class BuddyFormsFrontendTableDataOutput {
 					if ( isset( $item_order['column'] ) ) {
 						$target_field_id = ! empty( $fields_keys[ intval( $item_order['column'] ) ] ) ? $fields_keys[ intval( $item_order['column'] ) ] : false;
 						if ( ! empty( $target_field_id ) ) {
-							$target_field                                      = $fields[ $target_field_id ];
-							$meta_key                                          = $target_field['slug'] . '_clause';
-							$extra_ordering[ intval( $item_order['column'] ) ] = $meta_key;
-							$meta_query[ $meta_key ]                           = array(
+							$target_field                                        = $fields[ $target_field_id ];
+							$meta_key                                            = $target_field['slug'] . '_clause';
+							$extra_ordering[ intval( $item_order['column'] ) ]   = $meta_key;
+							$meta_query[ $meta_key ]                             = array(
 								'key'     => $target_field['slug'],
 								'compare' => 'EXIST',
-								'type'    => $this->buddyforms_cast_field_type( $target_field['type'] )
 							);
 						}
 					}
@@ -445,7 +444,7 @@ class BuddyFormsFrontendTableDataOutput {
 							$action_html    = apply_filters( 'buddyforms_datatable_action_html', $action_html, $post_id, $form_slug, $fields, $entry_metas );
 							$final_result[] = $action_html;
 						}
-						$result['data'][] = $final_result;
+						$result['data'][] = apply_filters( 'buddyforms_datatable_result_data', $final_result, $post_id, $form_slug, $fields );
 					}
 				}
 

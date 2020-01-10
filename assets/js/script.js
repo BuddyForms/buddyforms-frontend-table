@@ -9,6 +9,7 @@ var buddyformsDatatableInstance = {
 		var headRows = jQuery(currentTable).find('thead th');
 		var filterExample = '<div id="SLUG" class="buddyforms-data-table-filter-child dataTables_filter"><label for="SLUG">NAME<input data-field-type="TYPE" data-form-slug="' + targetForm + '" data-target-column="COLUMN" class="buddyforms-datatable-filter-input" type="search" name="SLUG" id="SLUG"></label></div>';
 		var targetColumn = 0;
+		var filterOutput = '';
 		jQuery.each(headRows, function() {
 			var currentRow = jQuery(this);
 			var isSearchable = currentRow.attr('data-searchable');
@@ -21,12 +22,16 @@ var buddyformsDatatableInstance = {
 				filterString = filterString.replace(/NAME/g, targetName);
 				filterString = filterString.replace(/TYPE/g, targetType);
 				filterString = filterString.replace(/COLUMN/g, targetColumn);
-				var targetContent = filterContainer.find('.ui-toolbar.ui-widget-header').first();
-				targetContent.prepend(filterString);
+				filterOutput += filterString;
 				haveFilters = true;
 			}
 			targetColumn++;
 		});
+
+		if (haveFilters && filterOutput.length > 0) {
+			var targetContent = filterContainer.find('.ui-toolbar.ui-widget-header').first();
+			targetContent.prepend(filterOutput);
+		}
 
 		return haveFilters;
 	},
@@ -160,6 +165,8 @@ var buddyformsDatatableInstance = {
 					}
 					currentTable.show();
 				});
+
+				tableOptions = BuddyFormsHooks.applyFilters('buddyforms-datatable:preInit', tableOptions, [targetForm, currentTable]);
 
 				var dataTable = jQuery(currentTable).DataTable(tableOptions);
 
