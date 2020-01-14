@@ -21,12 +21,35 @@ class BuddyFormsFrontendTableDataOutput {
 		add_action( 'wp_ajax_nopriv_buddyforms_data_table', array( $this, 'ajax_get_buddyforms_data_table' ) );
 		add_action( 'wp_ajax_buddyforms_data_table_autocomplete', array( $this, 'ajax_get_buddyforms_data_table_autocomplete' ) );
 		add_action( 'wp_ajax_nopriv_buddyforms_data_table_autocomplete', array( $this, 'ajax_get_buddyforms_data_table_autocomplete' ) );
+		add_filter( 'posts_orderby', array( $this, 'improve_meta_date_order' ), 10, 2 );
+	}
+
+	public function improve_meta_date_order( $order_by, $instance ) {
+		if ( ! empty( $instance ) && ! empty( $instance->query['form_slug'] ) ) {
+			/** @var WP_Meta_Query $meta_query */
+			$meta_query = $instance->meta_query;
+			$clauses = $meta_query->get_clauses();
+			if ( ! empty( $clauses ) ) {
+				foreach ( $clauses as $clause_key => $clause ) {
+					if ( $clause_key === 'form_clause' ) {
+						continue;
+					}
+					if ( ! empty( $clause['alias'] ) && ! empty( $clause['type'] ) && $clause['type'] === 'DATETIME' ) {
+						$datetime_format = apply_filters( 'buddyforms_datatable_meta_date_time_format', '%d/%m/%Y' );
+						$replace_by      = sprintf( 'STR_TO_DATE(%s.meta_value, "%s")', $clause['alias'], $datetime_format );
+						$order_by        = str_replace( $clause['alias'] . '.meta_value', $replace_by, $order_by );
+					}
+				}
+			}
+		}
+
+		return $order_by;
 	}
 
 	public function include_assets() {
 		if ( BuddyFormsFrontendTable::getNeedAssets() ) {
 			wp_enqueue_script( 'buddyforms-datatable', BUDDYFORMS_FRONTEND_TABLE_ASSETS . 'DataTables/datatables.min.js', array( 'jquery' ), BuddyFormsFrontendTable::getVersion() );
-			$posts_per_page = apply_filters( 'buddyforms_user_posts_query_args_posts_per_page', 10 );
+			$posts_per_page = apply_filters( 'buddyforms_datatable_user_posts_query_args_posts_per_page', 10 );
 			wp_localize_script( 'buddyforms-datatable', 'buddyformsDatatable', array(
 				'ajax'           => admin_url( 'admin-ajax.php' ),
 				'nonce'          => wp_create_nonce( __DIR__ . 'buddyforms-datatable' ),
@@ -198,7 +221,7 @@ class BuddyFormsFrontendTableDataOutput {
 		switch ( $field_type ) {
 			case 'time':
 			case 'date':
-				$cast = 'DATE';
+				$cast = 'DATETIME';
 				break;
 			default:
 				$cast = 'CHAR';
@@ -332,12 +355,13 @@ class BuddyFormsFrontendTableDataOutput {
 					if ( isset( $item_order['column'] ) ) {
 						$target_field_id = ! empty( $fields_keys[ intval( $item_order['column'] ) ] ) ? $fields_keys[ intval( $item_order['column'] ) ] : false;
 						if ( ! empty( $target_field_id ) ) {
-							$target_field                                        = $fields[ $target_field_id ];
-							$meta_key                                            = $target_field['slug'] . '_clause';
-							$extra_ordering[ intval( $item_order['column'] ) ]   = $meta_key;
-							$meta_query[ $meta_key ]                             = array(
+							$target_field                                      = $fields[ $target_field_id ];
+							$meta_key                                          = $target_field['slug'] . '_clause';
+							$extra_ordering[ intval( $item_order['column'] ) ] = $meta_key;
+							$meta_query[ $meta_key ]                           = array(
 								'key'     => $target_field['slug'],
 								'compare' => 'EXIST',
+								'type'    => $this->buddyforms_cast_field_type( $target_field['type'] )
 							);
 						}
 					}
