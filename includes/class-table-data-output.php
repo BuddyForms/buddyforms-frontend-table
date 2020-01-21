@@ -28,7 +28,7 @@ class BuddyFormsFrontendTableDataOutput {
 		if ( ! empty( $instance ) && ! empty( $instance->query['form_slug'] ) ) {
 			/** @var WP_Meta_Query $meta_query */
 			$meta_query = $instance->meta_query;
-			$clauses = $meta_query->get_clauses();
+			$clauses    = $meta_query->get_clauses();
 			if ( ! empty( $clauses ) ) {
 				foreach ( $clauses as $clause_key => $clause ) {
 					if ( $clause_key === 'form_clause' ) {
@@ -75,25 +75,26 @@ class BuddyFormsFrontendTableDataOutput {
 				'dom'            => apply_filters( 'buddyforms_datatable_dom', '<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-tl ui-corner-tr"f>t<"fg-toolbar ui-toolbar ui-widget-header ui-helper-clearfix ui-corner-bl ui-corner-br"rlp>' ),
 				//https://datatables.net/reference/option/language
 				'language'       => apply_filters( 'buddyforms_datatable_language', array(
-					"decimal"        => "",
-					"emptyTable"     => __( "No data available in table", 'buddyforms-frontend-table' ),
-					"info"           => __( "Showing _START_ to _END_ of _TOTAL_ entries", 'buddyforms-frontend-table' ),
-					"infoEmpty"      => __( "Showing 0 to 0 of 0 entries", 'buddyforms-frontend-table' ),
-					"infoFiltered"   => __( "(filtered from _MAX_ total entries)", 'buddyforms-frontend-table' ),
-					"infoPostFix"    => "",
-					"thousands"      => ",",
-					"lengthMenu"     => __( "Show _MENU_ entries", 'buddyforms-frontend-table' ),
-					"loadingRecords" => __( "Loading...", 'buddyforms-frontend-table' ),
-					"processing"     => __( "Processing...", 'buddyforms-frontend-table' ),
-					"search"         => __( "Search:", 'buddyforms-frontend-table' ),
-					"zeroRecords"    => __( "No matching records found", 'buddyforms-frontend-table' ),
-					"paginate"       => array(
+					"noSuggestionNotice" => __( "No results", 'buddyforms' ),
+					"decimal"            => "",
+					"emptyTable"         => __( "No data available in table", 'buddyforms-frontend-table' ),
+					"info"               => __( "Showing _START_ to _END_ of _TOTAL_ entries", 'buddyforms-frontend-table' ),
+					"infoEmpty"          => __( "Showing 0 to 0 of 0 entries", 'buddyforms-frontend-table' ),
+					"infoFiltered"       => __( "(filtered from _MAX_ total entries)", 'buddyforms-frontend-table' ),
+					"infoPostFix"        => "",
+					"thousands"          => ",",
+					"lengthMenu"         => __( "Show _MENU_ entries", 'buddyforms-frontend-table' ),
+					"loadingRecords"     => __( "Loading...", 'buddyforms-frontend-table' ),
+					"processing"         => __( "Processing...", 'buddyforms-frontend-table' ),
+					"search"             => __( "Search:", 'buddyforms-frontend-table' ),
+					"zeroRecords"        => __( "No matching records found", 'buddyforms-frontend-table' ),
+					"paginate"           => array(
 						"first"    => __( "First", 'buddyforms-frontend-table' ),
 						"last"     => __( "Last", 'buddyforms-frontend-table' ),
 						"next"     => __( "Next", 'buddyforms-frontend-table' ),
 						"previous" => __( "Previous", 'buddyforms-frontend-table' )
 					),
-					"aria"           => array(
+					"aria"               => array(
 						"sortAscending"  => __( ": activate to sort column ascending", 'buddyforms-frontend-table' ),
 						"sortDescending" => __( ": activate to sort column descending", 'buddyforms-frontend-table' )
 					)

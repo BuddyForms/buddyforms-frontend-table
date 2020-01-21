@@ -196,6 +196,7 @@ var buddyformsDatatableInstance = {
 							serviceUrl: buddyformsDatatable.ajax,
 							autoSelectFirst: true,
 							showNoSuggestionNotice: true,
+							noSuggestionNotice: buddyformsDatatable.language.noSuggestionNotice ? buddyformsDatatable.language.noSuggestionNotice : 'No results',
 							type: 'POST',
 							params: {'action': 'buddyforms_data_table_autocomplete', 'nonce': buddyformsDatatable.nonce, 'form_slug': targetForm, 'target_column': that[0]},
 							onInvalidateSelection: function() {
