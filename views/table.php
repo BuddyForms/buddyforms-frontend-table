@@ -18,7 +18,6 @@ foreach ( $columns as $column_id => $columns_data ) {
 	if ( $is_sortable && empty( $initial_order ) ) {
 		$initial_order = '[[ ' . $i . ', \"asc\" ]]';
 	}
-	$initial_order = sprintf( "data-order='%s'", apply_filters( 'buddyforms_datatable_default_order', $initial_order, $form_slug ) );
 	if ( ! $is_sortable ) {
 		$sortable_string = 'data-sortable="false"';
 	}
@@ -36,7 +35,11 @@ foreach ( $columns as $column_id => $columns_data ) {
 	}
 	$i ++;
 }
-$thead .= '</tr>';
+$thead         .= '</tr>';
+$initial_order = apply_filters( 'buddyforms_datatable_default_order', $initial_order, $form_slug );
+if ( ! empty( $initial_order ) ) {
+	$initial_order = sprintf( "data-order='%s'", $initial_order );
+}
 global $wp;
 $current_page = $wp->request;
 ?>
