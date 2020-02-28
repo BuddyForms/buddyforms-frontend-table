@@ -235,6 +235,48 @@ function buddyforms_frontend_table_fs_is_parent_active() {
 	return false;
 }
 
+function buddyforms_frontend_datatable_need_buddyforms() {
+	?>
+	<style>
+		.buddyforms-notice label.buddyforms-title {
+			background: rgba(0, 0, 0, 0.3);
+			color: #fff;
+			padding: 2px 10px;
+			position: absolute;
+			top: 100%;
+			bottom: auto;
+			right: auto;
+			-moz-border-radius: 0 0 3px 3px;
+			-webkit-border-radius: 0 0 3px 3px;
+			border-radius: 0 0 3px 3px;
+			left: 10px;
+			font-size: 12px;
+			font-weight: bold;
+			cursor: auto;
+		}
+
+		.buddyforms-notice .buddyforms-notice-body {
+			margin: .5em 0;
+			padding: 2px;
+		}
+
+		.buddyforms-notice.buddyforms-title {
+			margin-bottom: 30px !important;
+		}
+
+		.buddyforms-notice {
+			position: relative;
+		}
+	</style>
+	<div class="error buddyforms-notice buddyforms-title">
+		<label class="buddyforms-title">BuddyForms Frontend Table</label>
+		<div class="buddyforms-notice-body">
+			<b>Oops...</b> BuddyForms Frontend Table cannot run without <a target="_blank" href="https://themekraft.com/buddyforms/">BuddyForms</a>.
+		</div>
+	</div>
+	<?php
+}
+
 function buddyforms_frontend_table_fs_init() {
 	if ( buddyforms_frontend_table_fs_is_parent_active_and_loaded() ) {
 		// Init Freemius.
@@ -242,6 +284,8 @@ function buddyforms_frontend_table_fs_init() {
 		// Signal that the add-on's SDK was initiated.
 		do_action( 'buddyforms_frontend_table_fs_loaded' );
 		$GLOBALS['BuddyFormsFrontendTable'] = BuddyFormsFrontendTable::get_instance();
+	} else {
+		add_action( 'admin_notices', 'buddyforms_frontend_datatable_need_buddyforms');
 	}
 }
 

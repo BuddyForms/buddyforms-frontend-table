@@ -500,6 +500,8 @@ class BuddyFormsFrontendTableDataOutput {
 			foreach ( $fields as $field_id => $field_data ) {
 				$columns[ $field_data['slug'] ] = $field_data;
 			}
+
+			$columns['actions'] = array( 'frontend_table_sortable' => array( false ), 'frontend_table_filter' => array( false ), 'frontend_table' => array( 'enabled' ), 'name' => apply_filters('buddyforms_datatable_action_column_title', '', $form_slug), 'type' => 'edit' );
 		}
 
 		return $columns;
